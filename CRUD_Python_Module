@@ -1,44 +1,94 @@
-# Example Python Code to Insert a Document 
+# Example Python Code to Insert a Document
 
-from pymongo import MongoClient 
-from bson.objectid import ObjectId 
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 
-class AnimalShelter(object): 
-    """ CRUD operations for Animal collection in MongoDB """ 
+# ----------------------------
+# RECOMMENDED MONGODB INDEXES
+# Enhancement: document the index strategy so any deployment environment knows
+# exactly what to configure for acceptable query performance.
+#
+# Without indexes, every rescue filter query performs a full collection scan —
+# O(n) against all ~10,000 records. With these indexes, MongoDB narrows results
+# using the index tree before applying remaining filters.
+#
+# Create these indexes on the animals collection before running the application:
+#
+#   1. Compound index covering the three rescue filter fields:
+#      db.animals.createIndex({ animal_type: 1, breed: 1, sex_upon_outcome: 1 })
+#      Supports the exact-match and $in filters shared by all rescue type queries.
+#
+#   2. Single-field index on the age range field:
+#      db.animals.createIndex({ age_upon_outcome_in_weeks: 1 })
+#      Supports the $lte and $gte range comparisons used by every rescue query.
+#
+#   Both indexes together let MongoDB satisfy a rescue query (animal_type +
+#   breed $in + sex + age range) with an index scan rather than a full collection
+#   scan, reducing per-query cost from O(n) to approximately O(log n + k) where
+#   k is the number of matching documents.
+# ----------------------------
 
-    def __init__(self, username, password): 
-        # Initializing the MongoClient. This helps to access the MongoDB 
-        # databases and collections. This is hard-wired to use the aac 
-        # database, the animals collection, and the aac user. 
-        # 
-        # You must edit the password below for your environment. 
-        # 
-        # Connection Variables 
-        # 
+
+# ----------------------------
+# INTERNAL RESCUE QUERY CONFIGURATION
+# Enhancement: query construction lives in the model layer, not the controller.
+# The dashboard passes a rescue type code; this module translates it to a query.
+# Keeping MongoDB field names and operators here means a schema change requires
+# editing only this file — the dashboard callback never touches raw query syntax.
+# ----------------------------
+_RESCUE_QUERIES = {
+    "WR": {
+        "animal_type": "Dog",
+        "breed": {"$in": ["Labrador Retriever Mix", "Chesapeake Bay Retriever", "Newfoundland"]},
+        "sex_upon_outcome": "Intact Female",
+        "age_upon_outcome_in_weeks": {"$lte": 26},
+    },
+    "MWR": {
+        "animal_type": "Dog",
+        "breed": {"$in": ["German Shepherd", "Alaskan Malamute", "Old English Sheepdog", "Siberian Husky Mix"]},
+        "sex_upon_outcome": "Intact Male",
+        "age_upon_outcome_in_weeks": {"$lte": 26},
+    },
+    "DIT": {
+        "animal_type": "Dog",
+        "breed": {"$in": ["Doberman Pinscher", "German Shepherd", "Golden Retriever", "Bloodhound"]},
+        "sex_upon_outcome": "Intact Male",
+        "age_upon_outcome_in_weeks": {"$gte": 20, "$lte": 300},
+    },
+}
+
+
+class AnimalShelter(object):
+    """ CRUD operations for Animal collection in MongoDB """
+
+    def __init__(self, username, password):
+        # Initializing the MongoClient. This helps to access the MongoDB
+        # databases and collections. This is hard-wired to use the aac
+        # database, the animals collection, and the aac user.
+        #
+        # Connection Variables
+        #
         USER = username          # use the username passed in
         PASS = password          # use the password passed in
-        HOST = 'localhost' 
-        PORT = 27017 
-        DB = 'aac' 
-        COL = 'animals' 
-        # 
-        # Initialize Connection 
-        # 
-        self.client = MongoClient('mongodb://%s:%s@%s:%d' % (USER, PASS, HOST, PORT)) 
-        self.database = self.client['%s' % (DB)] 
-        self.collection = self.database['%s' % (COL)] 
+        HOST = 'localhost'
+        PORT = 27017
+        DB = 'aac'
+        COL = 'animals'
+        #
+        # Initialize Connection
+        #
+        self.client = MongoClient('mongodb://%s:%s@%s:%d' % (USER, PASS, HOST, PORT))
+        self.database = self.client['%s' % (DB)]
+        self.collection = self.database['%s' % (COL)]
 
-    # Create a method to return the next available record number for use in the create method
-            
     # Complete this create method to implement the C in CRUD.
     def create(self, data):
-        """ 
-        Insert a new document into the animals collection. 
+        """
+        Insert a new document into the animals collection.
         Returns True if the insert was successful, otherwise False.
         """
         if data is not None:
             try:
-                # use the collection object
                 result = self.collection.insert_one(data)
                 return result.acknowledged   # True or False
             except Exception as e:
@@ -56,7 +106,6 @@ class AnimalShelter(object):
         """
         if query is not None:
             try:
-                # Use find() to return all matching documents
                 documents = self.collection.find(query)
                 return list(documents)   # Convert cursor to list
             except Exception as e:
@@ -91,3 +140,46 @@ class AnimalShelter(object):
         else:
             print("Filter data is empty.")
             return False
+
+    def read_sample(self, limit=100):
+        """
+        Return up to `limit` records for lightweight startup or preview use.
+        Avoids loading the full collection at startup — the full dataset loads
+        on demand only when the All Animals filter is explicitly selected.
+        Raises ValueError if limit is not a positive integer.
+        """
+        if not isinstance(limit, int) or limit <= 0:
+            raise ValueError(
+                f"limit must be a positive integer, got {limit!r}"
+            )
+        try:
+            documents = self.collection.find({}).limit(limit)
+            return list(documents)
+        except Exception as e:
+            print(f"Error reading sample: {e}")
+            return []
+
+    def get_rescue_candidates(self, rescue_type):
+        """
+        Return animals matching the given rescue type criteria.
+
+        The dashboard passes a rescue type code (e.g. 'WR', 'MWR', 'DIT');
+        this method translates it to the appropriate MongoDB query internally.
+        The caller never needs to know what fields or operators the database uses.
+
+        Raises TypeError  if rescue_type is not a string.
+        Raises ValueError if rescue_type is not a recognized code.
+        Returns a list of matching documents, or an empty list on query error.
+        """
+        if not isinstance(rescue_type, str):
+            raise TypeError(
+                f"rescue_type must be a string, got {type(rescue_type).__name__!r}"
+            )
+        if rescue_type not in _RESCUE_QUERIES:
+            raise ValueError(
+                f"Unknown rescue_type: {rescue_type!r}. "
+                f"Valid values: {list(_RESCUE_QUERIES)}"
+            )
+
+        query = _RESCUE_QUERIES[rescue_type]
+        return self.read(query)
