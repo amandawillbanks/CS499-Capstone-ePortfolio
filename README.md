@@ -1,12 +1,33 @@
-SNHU CS-340 Project Two – Grazioso Salvare Dashboard
-Author
-Amanda Willbanks
+# CS 499 Capstone ePortfolio — Grazioso Salvare Dashboard
 
-Course
-CS-340: Client/Server Development
+**Author:** Amanda Willbanks
+**Program:** B.S. Computer Science, Southern New Hampshire University
 
-Project Overview
-This project implements an interactive web-based dashboard for Grazioso Salvare, a fictional animal rescue organization. The dashboard allows users to explore and analyze animal shelter data stored in a MongoDB database. It uses the Dash framework to present dynamic tables, visualizations, and geolocation mapping while following the MVC (Model–View–Controller) design pattern.
+---
+
+## Origin and Purpose
+
+This repository is my CS 499 Capstone ePortfolio. It contains an enhanced version of the Grazioso Salvare Dashboard, a project I originally built in **CS-340: Client/Server Development** (December 2025). The original project is available at [amandawillbanks/CS340](https://github.com/amandawillbanks/CS340).
+
+For the capstone, I selected this artifact because it is a complete, full-stack application that touches database integration, interactive UI design, data visualization, and backend logic — all within a single codebase. Rather than submitting surface-level work across unrelated projects, I chose to demonstrate depth by enhancing one artifact across three categories, showing that I can identify structural weaknesses through a code review, plan targeted improvements, and execute them with attention to security, performance, maintainability, and user value.
+
+## Enhancements
+
+The original dashboard was functional but had significant engineering gaps: hardcoded credentials, rescue filter logic embedded inside UI callbacks, fragile positional index lookups, no ranking of results, and a full 10,000-record startup load. Across three capstone milestones, I systematically addressed each one:
+
+| Milestone | Category | Key Enhancements |
+|---|---|---|
+| **Two** | Software Design & Engineering | Credentials moved to environment variables; rescue criteria extracted to a configuration dictionary; magic index lookups replaced with named column references |
+| **Three** | Algorithms & Data Structures | Weighted suitability scoring algorithm (max 10 pts); inverted breed index for O(1) lookup; query result caching; context-aware chart selection per filter type |
+| **Four** | Databases | Query construction moved into the CRUD module (`get_rescue_candidates()`); input validation with typed exceptions; `read_sample()` for lightweight startup; documented compound index strategy |
+
+Each enhancement is documented in a milestone narrative that explains the reasoning, course outcome alignment, and reflection.
+
+---
+
+## Project Overview
+
+This project implements an interactive web-based dashboard for Grazioso Salvare, a fictional animal rescue organization. The dashboard allows users to explore and analyze animal shelter data stored in a MongoDB database. It uses the Dash framework to present dynamic tables, visualizations, and geolocation mapping while following the MVC (Model-View-Controller) design pattern.
 The dashboard enables Grazioso Salvare to identify animals that are suitable for specialized rescue training scenarios such as Water Rescue, Mountain/Wilderness Rescue, and Disaster/Individual Tracking.
 
 Technologies Used:
