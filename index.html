@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CS 499 Capstone ePortfolio — Amanda Willbanks</title>
+  <style>
+    :root {
+      --primary: #0a0a0a;
+      --accent: #39ff14;
+      --accent-dim: #1a8a0a;
+      --bg: #0d0d0d;
+      --card-bg: #141414;
+      --text: #c8d6c8;
+      --text-light: #6a7a6a;
+      --border: #1f2f1f;
+      --glow: rgba(57, 255, 20, 0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Courier New', 'Lucida Console', monospace;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(57, 255, 20, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 50%, rgba(57, 255, 20, 0.02) 0%, transparent 50%);
+    }
+
+    /* ===================== SCANLINE OVERLAY ===================== */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 9999;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.03) 2px,
+        rgba(0, 0, 0, 0.03) 4px
+      );
+    }
+
+    /* ===================== HEADER ===================== */
+    header {
+      background: linear-gradient(180deg, #000000 0%, #0a120a 100%);
+      color: var(--accent);
+      padding: 2.5rem 2rem 1.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--accent-dim);
+      text-shadow: 0 0 20px rgba(57, 255, 20, 0.5), 0 0 40px rgba(57, 255, 20, 0.2);
+      position: relative;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+
+    header h1::after {
+      content: '_';
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    header .subtitle {
+      font-size: 1rem;
+      color: #6a9a6a;
+      letter-spacing: 2px;
+      margin-bottom: 1.25rem;
+    }
+
+    /* ===================== CONTACT BAR ===================== */
+    .contact-bar {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #1a2a1a;
+    }
+
+    .contact-bar a {
+      color: var(--text-light);
+      text-decoration: none;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      transition: color 0.3s, text-shadow 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .contact-bar a:hover {
+      color: var(--accent);
+      text-shadow: 0 0 8px rgba(57, 255, 20, 0.5);
+    }
+
+    .contact-bar .icon {
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    /* ===================== MAIN LAYOUT ===================== */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+    }
+
+    .tab-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    section { margin-bottom: 3rem; }
+
+    h2 {
+      color: var(--accent);
+      font-size: 1.4rem;
+      border-bottom: 1px solid var(--accent-dim);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+    }
+
+    h3 {
+      color: var(--accent);
+      font-size: 1.05rem;
+      margin: 1.5rem 0 0.75rem;
+      letter-spacing: 1px;
+    }
+
+    p { margin-bottom: 1rem; }
+
+    code {
+      background: #1a1a1a;
+      color: var(--accent);
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+      border: 1px solid #2a3a2a;
+    }
+
+    /* ===================== SIDEBAR TABS ===================== */
+    .tab-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border-right: 1px solid var(--accent-dim);
+      padding-right: 0;
+      position: sticky;
+      top: 2rem;
+      align-self: flex-start;
+      min-width: 220px;
+      flex-shrink: 0;
+    }
+
+    .tab-btn {
+      background: transparent;
+      color: var(--text-light);
+      border: none;
+      border-left: 2px solid transparent;
+      padding: 0.8rem 1.25rem;
+      font-family: inherit;
+      font-size: 0.78rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .tab-btn .tab-icon {
+      font-size: 1rem;
+      width: 1.2rem;
+      text-align: center;
+      opacity: 0.6;
+      transition: opacity 0.3s;
+    }
+
+    .tab-btn:hover {
+      color: var(--accent);
+      background: rgba(57, 255, 20, 0.04);
+      text-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
+    }
+
+    .tab-btn:hover .tab-icon { opacity: 1; }
+
+    .tab-btn.active {
+      color: var(--accent);
+      background: rgba(57, 255, 20, 0.06);
+      border-left-color: var(--accent);
+      text-shadow: 0 0 12px rgba(57, 255, 20, 0.5);
+      box-shadow: inset 3px 0 8px -3px rgba(57, 255, 20, 0.2);
+    }
+
+    .tab-btn.active .tab-icon { opacity: 1; }
+
+    .tab-bar::after {
+      content: '';
+      display: block;
+      margin: 1rem 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.65rem;
+      color: var(--text-light);
+      letter-spacing: 1px;
+      text-align: center;
+    }
+
+    /* ===================== TAB PANELS ===================== */
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .tab-panel.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(10px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ===================== CARDS ===================== */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 15px rgba(57, 255, 20, 0.04), inset 0 0 30px rgba(0,0,0,0.3);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+      border-color: var(--accent-dim);
+      box-shadow: 0 0 20px rgba(57, 255, 20, 0.08), inset 0 0 30px rgba(0,0,0,0.3);
+    }
+
+    .card h3 { margin-top: 0; }
+
+    .milestone-label {
+      display: inline-block;
+      background: transparent;
+      color: var(--accent);
+      padding: 0.2rem 0.6rem;
+      border-radius: 2px;
+      font-size: 0.75rem;
+      margin-bottom: 0.75rem;
+      border: 1px solid var(--accent-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ===================== TABLE ===================== */
+    .enhancements-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+
+    .enhancements-table th,
+    .enhancements-table td {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+    }
+
+    .enhancements-table th {
+      background: #0a150a;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .enhancements-table tr:nth-child(even) { background: #111811; }
+    .enhancements-table tr:hover { background: #0f1a0f; }
+
+    /* ===================== LINKS ===================== */
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: text-shadow 0.3s;
+    }
+
+    a:hover {
+      text-shadow: 0 0 8px rgba(57, 255, 20, 0.5);
+      text-decoration: none;
+    }
+
+    .artifact-links {
+      list-style: none;
+      padding: 0;
+    }
+
+    .artifact-links li {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+      transition: padding-left 0.2s;
+    }
+
+    .artifact-links li:hover { padding-left: 0.5rem; }
+    .artifact-links li:last-child { border-bottom: none; }
+
+    /* ===================== VIDEO ===================== */
+    video {
+      width: 100%;
+      max-width: 100%;
+      border-radius: 4px;
+      border: 1px solid var(--accent-dim);
+      box-shadow: 0 0 20px rgba(57, 255, 20, 0.08);
+    }
+
+    /* ===================== FOOTER ===================== */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-light);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+      letter-spacing: 1px;
+    }
+
+    footer .footer-links {
+      margin-top: 0.75rem;
+    }
+
+    footer .footer-links a {
+      color: var(--text-light);
+      margin: 0 0.75rem;
+      transition: color 0.3s;
+    }
+
+    footer .footer-links a:hover { color: var(--accent); }
+
+    ::selection {
+      background: var(--accent);
+      color: #000;
+    }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media (max-width: 768px) {
+      main { flex-direction: column; }
+      .tab-bar {
+        flex-direction: row;
+        overflow-x: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--accent-dim);
+        position: static;
+        min-width: 0;
+        padding-right: 0;
+        padding-bottom: 0;
+      }
+      .tab-bar::after { display: none; }
+      .tab-btn {
+        border-left: none;
+        border-bottom: 2px solid transparent;
+        padding: 0.6rem 0.75rem;
+        font-size: 0.7rem;
+      }
+      .tab-btn .tab-icon { display: none; }
+      .tab-btn.active {
+        border-left-color: transparent;
+        border-bottom-color: var(--accent);
+        box-shadow: none;
+      }
+      .contact-bar { gap: 1rem; flex-wrap: wrap; }
+      header h1 { font-size: 1.5rem; letter-spacing: 2px; }
+      main { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>CS 499 Capstone ePortfolio</h1>
+  <p class="subtitle">Amanda Willbanks &mdash; B.S. Computer Science, Southern New Hampshire University</p>
+  <div class="contact-bar">
+    <a href="https://github.com/amandawillbanks" target="_blank" rel="noopener">
+      <span class="icon">&#9651;</span> GitHub
+    </a>
+    <a href="https://github.com/amandawillbanks/CS499-Capstone-ePortfolio" target="_blank" rel="noopener">
+      <span class="icon">&#9661;</span> Source Repository
+    </a>
+    <a href="https://www.linkedin.com/in/amanda-willbanks-097a77210" target="_blank" rel="noopener">
+      <span class="icon">&#9655;</span> LinkedIn
+    </a>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <div class="tab-bar" role="tablist">
+    <button class="tab-btn active" role="tab" data-tab="self-assessment">
+      <span class="tab-icon">&#9654;</span> Self-Assessment
+    </button>
+    <button class="tab-btn" role="tab" data-tab="code-review">
+      <span class="tab-icon">&#9655;</span> Code Review
+    </button>
+    <button class="tab-btn" role="tab" data-tab="artifacts">
+      <span class="tab-icon">&#9670;</span> Artifacts
+    </button>
+    <button class="tab-btn" role="tab" data-tab="milestone2">
+      <span class="tab-icon">&#9632;</span> Software Eng.
+    </button>
+    <button class="tab-btn" role="tab" data-tab="milestone3">
+      <span class="tab-icon">&#9650;</span> Algorithms
+    </button>
+    <button class="tab-btn" role="tab" data-tab="milestone4">
+      <span class="tab-icon">&#9679;</span> Databases
+    </button>
+  </div>
+
+  <div class="tab-content">
+
+  <!-- ===================== TAB: SELF-ASSESSMENT ===================== -->
+  <div id="self-assessment" class="tab-panel active" role="tabpanel">
+    <h2>Professional Self-Assessment</h2>
+
+    <p>Completing the Computer Science program at SNHU has given me the opportunity to build, evaluate, and improve software across multiple domains, from database-backed web applications and mobile development to software testing, security analysis, and collaborative team projects. The capstone course, CS 499, asked me to take an artifact from earlier in my program and enhance it in ways that demonstrate growth across the full breadth of the discipline. That process &mdash; selecting an artifact, conducting a formal code review, planning targeted improvements, and executing them across three distinct categories, forced me to revisit my own earlier work with a critical eye and apply everything I have learned since I first wrote it.</p>
+
+    <p>This ePortfolio is the result. It presents a single artifact, the Grazioso Salvare Dashboard, enhanced across three milestones to demonstrate competence in software design and engineering, algorithms and data structures, and databases. But the skills that made those enhancements possible were developed across the entire program, not just in one course. This self-assessment introduces those skills, explains how the program shaped them, and connects them to the technical work that follows.</p>
+
+    <h3>Collaborating in a Team Environment</h3>
+    <p>Software development is rarely a solo activity, and several courses in the program emphasized that directly. In CS 310, I worked on a collaborative team project where shared version control, code reviews, and coordinated task planning were essential to delivering a working product. That experience taught me that writing code other people can read, extend, and maintain is as important as writing code that runs correctly.</p>
+    <p>That principle carried directly into my capstone enhancements. When I extracted the rescue filter criteria into a configuration dictionary in Milestone Two, I was not just improving maintainability for myself &mdash; I was making the codebase navigable for any future developer who might need to add a rescue type or modify a filter. When I documented the recommended MongoDB index strategy in the CRUD module in Milestone Four, I was writing for a database administrator who might never read the dashboard code at all.</p>
+
+    <h3>Communicating with Stakeholders</h3>
+    <p>Technical skill loses much of its value if it cannot be communicated clearly to the people who depend on it. CS 255 and CS 250 both required translating between technical implementation and business requirements, creating system design documents, writing user stories, and presenting technical decisions in terms that non-technical stakeholders could evaluate.</p>
+    <p>In the capstone, this skill showed up most clearly in the enhancement narratives I wrote for each milestone. Each narrative explains not just what I changed, but why it matters, why moving credentials out of source code reduces organizational risk, why a weighted scoring algorithm is more useful than an unranked list, why separating query logic from controller logic reduces the cost of future schema changes.</p>
+
+    <h3>Data Structures and Algorithms</h3>
+    <p>CS 260 gave me my formal introduction to data structures and algorithmic analysis, but the capstone is where I applied those concepts to a real, domain-specific problem. The Milestone Three enhancement required me to design a weighted scoring algorithm that ranks rescue candidates by suitability, accounting for breed match quality, age within an optimal trainability window, and sex preference. Beyond the scoring algorithm itself, I built an inverted index data structure that maps breed names to rescue type codes for O(1) lookup, and I implemented a query result cache that eliminates redundant database round-trips for previously fetched filter results.</p>
+
+    <h3>Software Engineering and Database</h3>
+    <p>On the software engineering side, the original dashboard had hardcoded credentials, rescue filter logic embedded inside UI callbacks, and fragile positional index lookups that would silently return wrong data if the dataset schema changed. The Milestone Two enhancements addressed each one: environment variable credential management, a centralized configuration dictionary, and named column references.</p>
+    <p>On the database side, the most significant enhancement was architectural. The original dashboard constructed raw MongoDB query documents directly inside Dash callback functions. In Milestone Four, I moved all query construction into the CRUD module, behind a <code>get_rescue_candidates()</code> method that accepts a rescue type code and returns results. I also replaced the full 10,000-record startup load with a 100-record sample method and documented a compound index strategy that reduces query cost from O(n) collection scans to O(log n + k) index scans.</p>
+
+    <h3>Security</h3>
+    <p>Security is not a feature that gets added at the end, it is a mindset that should inform decisions throughout development. CS 305 taught me to think about software from an adversarial perspective: what happens if this input is malicious, what happens if this credential is exposed, what happens if this validation is missing.</p>
+    <p>The most concrete security improvement in my capstone work was replacing hardcoded database credentials with environment variable lookups. Beyond credential management, I added input validation at the model boundary in Milestone Four: the <code>get_rescue_candidates()</code> method raises typed exceptions for invalid inputs rather than passing them through to the database driver.</p>
+
+    <h3>Portfolio Summary</h3>
+    <p>The three enhancements build on each other in a logical progression: Milestone Two established the structural foundation with secure credential handling and a clean configuration layer. Milestone Three added analytical capability with a weighted scoring algorithm, inverted index, caching, and context-aware visualization. Milestone Four completed the architectural separation by moving query construction into the model layer, adding input validation, and optimizing startup performance. Together, they demonstrate that I can take a working but fragile application, identify its structural weaknesses through a systematic code review, and execute targeted improvements with attention to security, performance, maintainability, and user value.</p>
+  </div>
+
+  <!-- ===================== TAB: CODE REVIEW ===================== -->
+  <div id="code-review" class="tab-panel" role="tabpanel">
+    <h2>Code Review</h2>
+    <p>Before beginning the enhancements, I conducted a formal code review of the original Grazioso Salvare Dashboard. The review identified key areas for improvement including hardcoded credentials, tightly coupled query logic, lack of ranking algorithms, and an inefficient full-dataset startup load. The video below walks through the existing functionality, the code analysis, and the planned enhancements across all three categories.</p>
+    <video controls preload="metadata">
+      <source src="CS499_Code_Review.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+  <!-- ===================== TAB: ARTIFACTS ===================== -->
+  <div id="artifacts" class="tab-panel" role="tabpanel">
+    <h2>Artifacts Overview</h2>
+
+    <p>This ePortfolio uses a single artifact &mdash; the Grazioso Salvare Dashboard &mdash; enhanced across three milestones. The original was built in CS-340: Client/Server Development (December 2025). Each version below represents the cumulative state of the artifact after its corresponding milestone enhancement.</p>
+
+    <table class="enhancements-table">
+      <thead>
+        <tr>
+          <th>Milestone</th>
+          <th>Category</th>
+          <th>Key Enhancements</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Two</strong></td>
+          <td>Software Design &amp; Engineering</td>
+          <td>Credentials moved to environment variables; rescue criteria extracted to configuration dictionary; magic index lookups replaced with named column references</td>
+        </tr>
+        <tr>
+          <td><strong>Three</strong></td>
+          <td>Algorithms &amp; Data Structures</td>
+          <td>Weighted suitability scoring algorithm (max 10 pts); inverted breed index for O(1) lookup; query result caching; context-aware chart selection</td>
+        </tr>
+        <tr>
+          <td><strong>Four</strong></td>
+          <td>Databases</td>
+          <td>Query construction moved into CRUD module; input validation with typed exceptions; <code>read_sample()</code> for lightweight startup; documented compound index strategy</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Artifact Files</h3>
+    <ul class="artifact-links">
+      <li><a href="ProjectTwoDashboard-Complete.ipynb">Original Dashboard</a> &mdash; Pre-enhancement baseline from CS-340</li>
+      <li><a href="ProjectTwoDashboard-Complete-Enhanced.ipynb">Enhanced v1</a> &mdash; After Milestone Two (Software Engineering)</li>
+      <li><a href="ProjectTwoDashboard-Complete-Enhanced-v2.ipynb">Enhanced v2</a> &mdash; After Milestone Three (Algorithms &amp; Data Structures)</li>
+      <li><a href="ProjectTwoDashboard-Complete-Enhanced-v3.ipynb">Enhanced v3</a> &mdash; After Milestone Four (Databases) &mdash; Final version</li>
+      <li><a href="CRUD_Python_Module">CRUD Module</a> &mdash; Model layer with full CRUD operations, rescue query encapsulation, and index documentation</li>
+    </ul>
+  </div>
+
+  <!-- ===================== TAB: MILESTONE 2 ===================== -->
+  <div id="milestone2" class="tab-panel" role="tabpanel">
+    <h2>Enhancement One: Software Design and Engineering</h2>
+    <div class="card">
+      <span class="milestone-label">Milestone Two</span>
+      <h3>Narrative</h3>
+
+      <p>The artifact I selected for the software design and engineering category is the Grazioso Salvare Dashboard, a Python-based interactive web application I originally developed in December 2025 during CS-340: Client/Server Development. The dashboard connects to a MongoDB database containing animal shelter records from the Austin Animal Center and allows users to filter, explore, and visualize data to identify animals suitable for specialized rescue training programs.</p>
+
+      <p>I selected this artifact for my ePortfolio because it represents a complete, functional full-stack application that touches several areas of computer science simultaneously &mdash; database integration, interactive UI design, data visualization, and backend logic &mdash; all within a single, reviewable codebase.</p>
+
+      <p>The most serious weakness was that database credentials were hardcoded as plain-text strings directly in the notebook. In my enhanced version, I replaced these lines with environment variable lookups using <code>os.environ.get()</code>, and added a clear <code>EnvironmentError</code> with instructions if the variables are not set.</p>
+
+      <p>The second major improvement was extracting the rescue filter criteria out of the callback function and into a dedicated configuration dictionary called <code>RESCUE_CRITERIA</code>. Adding a new rescue type now requires only a new entry in the dictionary, with no changes to the callback itself.</p>
+
+      <p>Third, I replaced fragile positional index lookups in the map callback &mdash; such as <code>dff.iloc[row, 4]</code> &mdash; with named column lookups using <code>dff.loc[row, "breed"]</code>. The named approach is both safer and self-documenting.</p>
+
+      <p><strong>Course Outcomes:</strong> Outcome 1 (collaborative environments), Outcome 3 (computing solutions), Outcome 5 (security mindset).</p>
+
+      <p><a href="Milestone2_Narrative_SoftwareEngineering.md">Read the full narrative</a> &nbsp;|&nbsp; <a href="ProjectTwoDashboard-Complete-Enhanced.ipynb">View the enhanced artifact</a></p>
+    </div>
+  </div>
+
+  <!-- ===================== TAB: MILESTONE 3 ===================== -->
+  <div id="milestone3" class="tab-panel" role="tabpanel">
+    <h2>Enhancement Two: Algorithms and Data Structures</h2>
+    <div class="card">
+      <span class="milestone-label">Milestone Three</span>
+      <h3>Narrative</h3>
+
+      <p>I selected this artifact for the algorithms and data structure category because it contains a natural, domain-grounded problem that a well-designed algorithm can meaningfully solve. The Milestone Two version of the dashboard used a binary filter: an animal either matched the MongoDB query or it did not. When thirty dogs met the Water Rescue criteria, they appeared in whatever order MongoDB returned them with no indication of which ones were the strongest candidates. That is a ranking problem, and ranking problems are where algorithms earn their value.</p>
+
+      <p>The primary addition is <code>compute_suitability_score()</code>, a weighted scoring function that assigns a numeric rescue suitability score to each animal based on three criteria: breed match quality (5 points for a primary match, 3 for a secondary match), age within the optimal trainability window (3 points), and sex match (2 points), for a maximum of 10.</p>
+
+      <p>The second enhancement is <code>BREED_INDEX</code>, a precomputed inverted index built once at startup from <code>RESCUE_CRITERIA</code>. It maps each breed name to the set of rescue type codes it qualifies for, enabling O(1) lookup.</p>
+
+      <p>The third enhancement is <code>_query_cache</code>, a module-level dictionary that caches MongoDB query results by filter type key to avoid redundant round-trips.</p>
+
+      <p>The fourth enhancement makes the chart context-aware through <code>_CHART_CONFIG</code>, switching between breed distribution pies, age histograms, and outcome type charts depending on the active filter.</p>
+
+      <p><strong>Course Outcomes:</strong> Outcome 1 (collaborative environments), Outcome 3 (algorithmic principles), Outcome 4 (innovative techniques).</p>
+
+      <p><a href="Milestone3_Narrative_AlgorithmsDataStructures.md">Read the full narrative</a> &nbsp;|&nbsp; <a href="ProjectTwoDashboard-Complete-Enhanced-v2.ipynb">View the enhanced artifact</a></p>
+    </div>
+  </div>
+
+  <!-- ===================== TAB: MILESTONE 4 ===================== -->
+  <div id="milestone4" class="tab-panel" role="tabpanel">
+    <h2>Enhancement Three: Databases</h2>
+    <div class="card">
+      <span class="milestone-label">Milestone Four</span>
+      <h3>Narrative</h3>
+
+      <p>I selected this artifact for the databases category because the gap between its original state and a well-engineered database layer is specific and instructive. In both the original dashboard and the Milestone Two version, the callback function responsible for handling user filter selections was also responsible for constructing raw MongoDB query documents inline, inside controller code. That is a violation of the separation of concerns that the MVC pattern is supposed to enforce.</p>
+
+      <p>The most significant enhancement is moving query construction out of the dashboard and into the CRUD module. I added a module-level <code>_RESCUE_QUERIES</code> dictionary and a new <code>get_rescue_candidates(rescue_type)</code> method that uses this dictionary to build and execute the appropriate query. The dashboard no longer constructs any MongoDB syntax.</p>
+
+      <p>The second enhancement is input validation inside <code>get_rescue_candidates()</code>. Before executing any query, the method checks that <code>rescue_type</code> is a string and that it is a recognized key, raising <code>TypeError</code> or <code>ValueError</code> with descriptive messages if either check fails.</p>
+
+      <p>The third enhancement is a new <code>read_sample(limit=100)</code> method that returns a small number of records without loading the full collection, replacing the original 10,000-record startup load.</p>
+
+      <p>The fourth enhancement is a documented index strategy specifying the compound and single-field indexes needed to reduce query cost from O(n) to O(log n + k).</p>
+
+      <p><strong>Course Outcomes:</strong> Outcome 1 (collaborative environments), Outcome 2 (professional communications), Outcome 3 (computing solutions), Outcome 4 (industry-specific goals), Outcome 5 (security mindset).</p>
+
+      <p><a href="Milestone4_Narrative_Databases.md">Read the full narrative</a> &nbsp;|&nbsp; <a href="ProjectTwoDashboard-Complete-Enhanced-v3.ipynb">View the enhanced artifact</a> &nbsp;|&nbsp; <a href="CRUD_Python_Module">View the CRUD module</a></p>
+    </div>
+  </div>
+
+  </div> <!-- /.tab-content -->
+
+</main>
+
+<footer>
+  <p>Amanda Willbanks &mdash; CS 499 Computer Science Capstone &mdash; Southern New Hampshire University &mdash; 2026</p>
+  <div class="footer-links">
+    <a href="https://github.com/amandawillbanks">GitHub</a>
+    <a href="https://github.com/amandawillbanks/CS499-Capstone-ePortfolio">Repository</a>
+    <a href="https://www.linkedin.com/in/amanda-willbanks-097a77210" target="_blank" rel="noopener">LinkedIn</a>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>
